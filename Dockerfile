@@ -32,8 +32,13 @@ RUN base=https://github.com/docker/machine/releases/download/$DOCKER_MACHINE_VER
     curl -L $base/docker-machine-$(uname -s)-$(uname -m) > /tmp/docker-machine && \
     install /tmp/docker-machine /usr/local/bin/docker-machine
     
+# kubectl
+FROM base as kubectl
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl && mv kubectl /usr/local/bin
+    
 # Final Image
 FROM base
 COPY --from=docker /usr/local/bin/docker /usr/local/bin
 COPY --from=docker_compose /usr/local/bin/docker-compose /usr/local/bin
 COPY --from=docker_machine /usr/local/bin/docker-machine /usr/local/bin
+COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin
